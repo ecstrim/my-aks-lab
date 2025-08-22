@@ -1,0 +1,68 @@
+# Terraform Backend Configuration for Azure Storage
+# 
+# This file configures Terraform to store state remotely in Azure Blob Storage
+# for better collaboration, state locking, and backup capabilities.
+#
+# SETUP INSTRUCTIONS:
+# 1. Run the setup script: ./scripts/setup-remote-state.sh
+# 2. Rename this file to backend.tf: cp backend.tf.example backend.tf
+# 3. Update the values below with your actual resource names
+# 4. Run: terraform init
+#
+# IMPORTANT NOTES:
+# - The backend configuration cannot use variables or interpolation
+# - All values must be hardcoded or provided via CLI arguments
+# - State locking is automatically enabled with Azure Storage
+# - Backup your state files before making changes
+
+terraform {
+  backend "azurerm" {
+    # Resource group containing the storage account
+    resource_group_name = "rg-terraform-state"
+    
+    # Storage account name (must be globally unique)
+    storage_account_name = "tfstate123456"  # Replace with your storage account name
+    
+    # Container name within the storage account
+    container_name = "tfstate"
+    
+    # Path to the state file within the container
+    # Use different keys for different environments/projects
+    key = "aks-cluster/terraform.tfstate"
+    
+    # Optional: Authentication settings
+    # If not specified, will use Azure CLI authentication or environment variables
+    # subscription_id = "00000000-0000-0000-0000-000000000000"
+    # tenant_id      = "00000000-0000-0000-0000-000000000000"
+    
+    # Optional: Use service principal authentication instead of Azure CLI
+    # client_id       = "00000000-0000-0000-0000-000000000000"
+    # client_secret   = "your-client-secret"
+    
+    # Optional: Use managed identity (for Azure VMs/Container Instances)
+    # use_msi = true
+  }
+}
+
+# Additional backend configurations for different environments
+# Uncomment and modify as needed
+
+# Development backend
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "rg-terraform-state"
+#     storage_account_name = "tfstate123456"
+#     container_name       = "tfstate"
+#     key                 = "aks-cluster/dev/terraform.tfstate"
+#   }
+# }
+
+# Production backend
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "rg-terraform-state"
+#     storage_account_name = "tfstate123456"
+#     container_name       = "tfstate"
+#     key                 = "aks-cluster/prod/terraform.tfstate"
+#   }
+# }

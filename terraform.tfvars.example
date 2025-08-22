@@ -1,0 +1,127 @@
+# Core Configuration
+workload    = "myapp"
+environment = "dev"
+location    = "italynorth"
+instance    = 1
+
+# =============================================================================
+# RESOURCE GROUP CONFIGURATION
+# =============================================================================
+
+# Option 1: Create new resource group (default)
+create_resource_group = true
+# resource_group_name = "my-custom-rg-name" # Optional: custom name, otherwise uses naming convention
+
+# Option 2: Use existing resource group
+# create_resource_group        = false
+# existing_resource_group_name = "rg-existing-myapp-prod-itn-01"
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+
+# Option 1: Create new VNet and subnet (default)
+create_vnet               = true
+create_nsg                = true
+vnet_address_space        = "10.0.0.0/16"
+aks_subnet_address_prefix = "10.0.1.0/24"
+
+# Option 2: Use existing VNet and subnet
+# create_vnet                        = false
+# existing_vnet_name                 = "vnet-myapp-prod-itn-01"
+# existing_vnet_resource_group_name  = "rg-network-prod-itn-01"
+# existing_subnet_name               = "snet-aks-myapp-prod-itn-01"
+
+# =============================================================================
+# AKS CONFIGURATION
+# =============================================================================
+
+kubernetes_version = "1.30"
+
+# Custom name for AKS managed resource group (optional)
+# If empty, defaults to "rg-mc-{workload}-{env}-{region}-{instance}"
+# node_resource_group_name = "rg-mc-myapp-custom-name"
+
+# =============================================================================
+# NODE POOL CONFIGURATION
+# =============================================================================
+
+# Preset options: "low" (B-series), "high" (D-series), "custom"
+node_pool_preset = "low"
+
+# Custom VM SKUs (only used when node_pool_preset = "custom")
+# custom_system_vm_sku = "Standard_D4s_v5"
+# custom_user_vm_sku   = "Standard_D4s_v5"
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+# API Server Access Control
+# Add your IP addresses or CIDR ranges for API server access
+# Leave empty for public access (not recommended for production)
+api_server_authorized_ip_ranges = [
+  # "1.2.3.4/32",      # Your office IP
+  # "5.6.7.0/24"       # Your VPN range
+]
+
+# Network Plugin Configuration
+network_plugin      = "azure"
+network_plugin_mode = "overlay"
+network_policy      = "azure"
+
+# Network CIDRs
+pod_cidr       = "10.244.0.0/16"
+service_cidr   = "10.245.0.0/16"
+dns_service_ip = "10.245.0.10"
+outbound_type  = "loadBalancer"
+
+# Auto-scaling Configuration
+enable_auto_scaling = true
+
+# System Node Pool
+system_node_count      = 1
+system_min_count       = 1
+system_max_count       = 3
+system_os_disk_size_gb = 128
+system_os_disk_type    = "Managed"
+
+# User Node Pool
+user_node_count      = 1
+user_min_count       = 1
+user_max_count       = 5
+user_os_disk_size_gb = 128
+user_os_disk_type    = "Managed"
+
+# User Node Pool Spot Configuration
+user_node_pool_priority        = "Regular" # Set to "Spot" for cost savings in non-production
+user_node_pool_eviction_policy = "Delete"
+user_node_pool_spot_max_price  = -1 # -1 means pay up to on-demand price
+
+# Azure AD / Entra ID Configuration
+azure_rbac_enabled = true
+# Add your Azure AD group object IDs for admin access
+admin_group_object_ids = [
+  # "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+]
+local_account_disabled = true
+
+# Auto-scaler Profile
+auto_scaler_profile = {
+  balance_similar_node_groups      = true
+  max_graceful_termination_sec     = 600
+  scale_down_delay_after_add       = "10m"
+  scale_down_delay_after_delete    = "10s"
+  scale_down_delay_after_failure   = "3m"
+  scan_interval                    = "10s"
+  scale_down_unneeded              = "10m"
+  scale_down_unready               = "20m"
+  scale_down_utilization_threshold = 0.5
+}
+
+# Resource Tags
+tags = {
+  "cost-center" = "engineering"
+  "project"     = "kubernetes-platform"
+  "owner"       = "platform-team"
+}

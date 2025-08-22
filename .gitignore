@@ -16,6 +16,16 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 
+# Allow example files to be committed
+!*.tfvars.example
+!terraform.tfvars.example
+
+# Explicitly exclude secrets files
+secrets.tfvars*
+!secrets.tfvars.example
+*.secrets.tfvars*
+*.secret.tfvars*
+
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
 override.tf
